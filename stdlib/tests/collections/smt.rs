@@ -514,6 +514,41 @@ fn tsmt_set_48() {
 }
 
 #[test]
+fn tsmt_set_48_lone_sibling_move_to_32() {
+    let mut smt = TieredSmt::default();
+
+    // depth 48 leaf
+    let raw_a = 0b00000000_00000000_11111111_11111111_11111111_11111111_11111111_11111111_u64;
+    let key_a = RpoDigest::from([ONE, ONE, ONE, Felt::new(raw_a)]);
+    let val_a = [ONE, ZERO, ZERO, ZERO];
+    smt.insert(key_a.into(), val_a);
+
+    // depth 48 leaf
+    let raw_b = 0b00000000_00000000_11111111_11111111_11111111_00111111_11111111_11111111_u64;
+    let key_b = RpoDigest::from([ONE, ONE, ONE, Felt::new(raw_b)]);
+    let val_b = [ONE, ONE, ZERO, ZERO];
+    smt.insert(key_b.into(), val_b);
+
+    // depth 32 leaf
+    let raw_c = 0b00000000_00000000_11111111_11111110_11111111_11111111_11111111_11111111_u64;
+    let key_c = RpoDigest::from([ONE, ONE, ONE, Felt::new(raw_c)]);
+    let val_c = [ONE, ZERO, ZERO, ZERO];
+    smt.insert(key_c.into(), val_c);
+
+    // depth 32 leaf
+    let raw_d = 0b00000000_00000000_11111111_11111101_11111111_11111111_11111111_11111111_u64;
+    let key_d = RpoDigest::from([ONE, ONE, ONE, Felt::new(raw_d)]);
+    let val_d = [ONE, ONE, ZERO, ZERO];
+    smt.insert(key_d, val_d);
+
+    // remove leaf a such that it key_b, val_b should move to depth 32
+    let init_smt = smt.clone();
+    smt.insert(key_a.into(), EMPTY_VALUE);
+    let new_map_entries = [build_node_entry(key_b, val_b, 32)];
+    assert_set(&init_smt, key_a, val_a, EMPTY_VALUE, smt.root().into(), &new_map_entries);
+}
+
+#[test]
 fn tsmt_set_48_from_32() {
     let mut smt = TieredSmt::default();
 
