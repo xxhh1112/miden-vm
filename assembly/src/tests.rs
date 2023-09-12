@@ -699,6 +699,28 @@ fn program_with_phantom_mast_call() {
     assert!(result.is_ok());
 }
 
+#[test]
+fn two_programs_with_proc_name_and_mast_collisions() {
+    let assembler = super::Assembler::default();
+
+    let source_1 = "proc.foo push.3 push.7 mul end begin push.2 push.3 add exec.foo end";
+    let source_2 = "proc.foo push.3 push.7 mul end begin push.2 push.3 add exec.foo end";
+
+    let ast_1 = ProgramAst::parse(source_1).unwrap();
+    let ast_2 = ProgramAst::parse(source_2).unwrap();
+
+    // compile first program
+    let mut context = AssemblyContext::for_program(&ProgramAst::parse("begin end").unwrap());
+    let result = assembler.compile_in_context(&ast_1, &mut context);
+    assert!(result.is_ok());
+
+    // compile second program
+    let result = assembler.compile_in_context(&ast_2, &mut context);
+    let err = result.err().unwrap();
+    let expected_error = "duplicate proc name 'foo' in module #exec";
+    assert_eq!(expected_error, err.to_string());
+}
+
 // IMPORTS
 // ================================================================================================
 
