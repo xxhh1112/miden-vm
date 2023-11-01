@@ -1,6 +1,7 @@
 use clap::Parser;
 use core::fmt;
 use miden::{AssemblyError, ExecutionError};
+use std::io::Write;
 
 mod cli;
 mod examples;
@@ -52,6 +53,16 @@ impl Cli {
 pub fn main() {
     // read command-line args
     let cli = Cli::parse();
+
+    // configure logging
+    // if logging level is not specified, set level to "warn"
+    if std::env::var("MIDEN_LOG").is_err() {
+        std::env::set_var("MIDEN_LOG", "warn");
+    }
+    // use "MIDEN_LOG" environment variable to change the logging level
+    env_logger::Builder::from_env("MIDEN_LOG")
+        .format(|buf, record| writeln!(buf, "{}", record.args()))
+        .init();
 
     // execute cli action
     if let Err(error) = cli.execute() {

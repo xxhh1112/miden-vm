@@ -1,3 +1,5 @@
+use.std::math::u64
+
 begin
     # push the root of the Partial Merkle Tree on the stack
     push.0x82bb4d9a8e93582f1387611949703eecd8e4c74b904880f9c9c85f1fc1d7576d
@@ -33,6 +35,11 @@ begin
     push.22.0.0.0
     assert_eqw
 
+
+
     dropw
+
+    push.1.2
+    exec.u64::checked_add
 
 end

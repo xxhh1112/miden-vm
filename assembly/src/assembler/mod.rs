@@ -264,6 +264,12 @@ impl Assembler {
             }
         }
 
+        // log the completion of the module
+        log::debug!(
+            "\n - Module \"{}\" has been compiled",
+            path.unwrap_or(&LibraryPath::anon_path())
+        );
+
         Ok(proc_roots)
     }
 

@@ -2,7 +2,7 @@ use super::data::{Debug, InputFile, Libraries, OutputFile, ProgramFile, ProofFil
 use clap::Parser;
 use miden::ProvingOptions;
 use processor::{DefaultHost, ExecutionOptions, ExecutionOptionsError};
-use std::{io::Write, path::PathBuf, time::Instant};
+use std::{path::PathBuf, time::Instant};
 
 // TODO check if clap is supporting automatic generation of list values of hash function
 #[derive(Debug, Clone, Parser)]
@@ -64,12 +64,6 @@ impl ProveCmd {
         println!("============================================================");
         println!("Prove program");
         println!("============================================================");
-
-        // configure logging
-        env_logger::Builder::new()
-            .format(|buf, record| writeln!(buf, "{}", record.args()))
-            .filter_level(log::LevelFilter::Debug)
-            .init();
 
         // load libraries from files
         let libraries = Libraries::new(&self.library_paths)?;

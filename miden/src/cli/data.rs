@@ -10,7 +10,7 @@ use serde_derive::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
     fs,
-    io::Write,
+    io::{stdout, Write},
     path::{Path, PathBuf},
     time::Instant,
 };
@@ -406,6 +406,7 @@ impl ProgramFile {
         L: Library,
     {
         print!("Compiling program... ");
+        stdout().flush().expect("Couldn't flush stdout");
         let now = Instant::now();
 
         // compile program
