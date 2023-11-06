@@ -265,6 +265,7 @@ impl Assembler {
         }
 
         // log the completion of the module
+        #[cfg(feature = "std")]
         log::debug!(
             "\n - Module \"{}\" has been compiled",
             path.unwrap_or(&LibraryPath::anon_path())

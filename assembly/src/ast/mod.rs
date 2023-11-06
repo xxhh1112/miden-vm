@@ -224,6 +224,9 @@ impl ProgramAst {
             return Err(ParsingError::dangling_ops_after_program(token));
         }
 
+        #[cfg(feature = "std")]
+        check_unused_imports(context.import_info);
+
         let local_procs = sort_procs_into_vec(context.local_procs);
         let (nodes, locations) = body.into_parts();
         Ok(Self::new(nodes, local_procs)?
@@ -937,4 +940,18 @@ fn sort_procs_into_vec(proc_map: LocalProcMap) -> Vec<ProcedureAst> {
     procedures.sort_by_key(|(idx, _proc)| *idx);
 
     procedures.into_iter().map(|(_idx, proc)| proc).collect()
+}
+
+/// Logging a warning message for every imported but unused module.
+#[cfg(feature = "std")]
+fn check_unused_imports(import_info: &ModuleImports) {
+    let import_lib_paths = import_info.import_paths();
+    let invoked_procs_paths: Vec<&LibraryPath> =
+        import_info.invoked_procs().iter().map(|(_id, (_name, path))| path).collect();
+
+    for lib in import_lib_paths {
+        if !invoked_procs_paths.contains(&lib) {
+            log::warn!("warning: unused import: \"{}\"", lib);
+        }
+    }
 }
